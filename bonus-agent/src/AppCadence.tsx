@@ -148,15 +148,27 @@ function SectionHeader({
   eyebrow,
   title,
   subtitle,
+  className,
+  titleClassName,
 }: {
   eyebrow: string
   title: string
   subtitle?: string
+  // Override the wrapper's max-width when a section needs a wider title (e.g.,
+  // a single-line headline that would otherwise wrap inside `max-w-2xl`).
+  className?: string
+  // Optional title-only override — used to force `whitespace-nowrap` on
+  // headlines that must stay on one line at large breakpoints.
+  titleClassName?: string
 }) {
   return (
-    <Reveal className="flex max-w-2xl flex-col gap-4">
+    <Reveal className={`flex flex-col gap-4 ${className ?? "max-w-2xl"}`}>
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="text-balance text-3xl font-semibold leading-[1.12] text-foreground sm:text-4xl lg:text-5xl">
+      <h2
+        className={`text-balance text-3xl font-semibold leading-[1.12] text-foreground sm:text-4xl lg:text-5xl ${
+          titleClassName ?? ""
+        }`}
+      >
         {title}
       </h2>
       {subtitle && (
@@ -263,15 +275,14 @@ function Hero() {
 /* ── see it in action ──────────────────────────────────────────────────────
    Two live iframes of the dashboard, sized to actual device proportions:
    desktop at 1280×720 (HD), mobile at 375×812 (iPhone X-class). On lg+ the
-   phone column is fixed at 240 px so the mobile card stays visually compact
-   (≈520 px tall) instead of stretching to match the desktop's height — the
-   prior `[3.85fr_1fr]` ratio equalised heights but made the phone read as
-   an awkwardly tall panel. The desktop column fills the remaining space;
-   `items-end` bottom-aligns the two previews so they share a baseline.
-   On < lg the row collapses into a stack; each card caps its own max-width
-   (`640` / `240`) so the desktop preview still looks like a screen and the
-   phone still looks like a phone. A short caption under each preview names
-   the screen so the reader knows what they're looking at. */
+   grid is `[3.85fr_1fr]` — exactly (1280/720) / (375/812), the ratio that
+   lands both cards on the SAME visible height while each keeps its native
+   aspect. `items-start` top-aligns the two cards so they read as a matched
+   pair. On < lg the row collapses into a stack; each card caps its own
+   max-width (`640` / `240`) so the desktop preview still looks like a
+   screen and the phone still looks like a phone. A single shared caption
+   sits below the grid naming what's currently on screen — one line of
+   context for both previews, no per-card repetition. */
 function SeeItInAction() {
   return (
     <section id="demo" className="scroll-mt-20 py-14 sm:py-20">
@@ -280,14 +291,17 @@ function SeeItInAction() {
           eyebrow="See it in action"
           title="The dashboard the operator actually uses."
           subtitle="Two live previews of the same tool — desktop on the left, mobile on the right. Both are interactive: click the timeline, expand a campaign, edit any field."
+          // Wider wrapper + nowrap on lg+ keeps the headline on a single
+          // line at the breakpoint where text-5xl kicks in.
+          className="max-w-5xl"
+          titleClassName="lg:whitespace-nowrap"
         />
-        <div className="mt-12 grid grid-cols-1 items-center justify-items-center gap-6 lg:mt-14 lg:grid-cols-[1fr_240px] lg:items-end lg:justify-items-stretch">
+        <div className="mt-12 grid grid-cols-1 items-center justify-items-center gap-6 lg:mt-14 lg:grid-cols-[3.85fr_1fr] lg:items-start lg:justify-items-stretch">
           <Reveal delay={0.05} className="w-full max-w-[640px] lg:max-w-none">
             <FramePreview
               nativeWidth={1280}
               nativeHeight={720}
               ariaLabel="Live desktop preview of Bonus Agent dashboard"
-              caption="Timeline kanban — 14 days of promos in one view. Click any card to expand the inline ACMS editor."
             />
           </Reveal>
           <Reveal delay={0.08} className="w-full max-w-[240px] lg:max-w-none">
@@ -295,10 +309,14 @@ function SeeItInAction() {
               nativeWidth={375}
               nativeHeight={812}
               ariaLabel="Live mobile preview of Bonus Agent dashboard"
-              caption="Same dashboard on mobile — every field, one-tap edit."
             />
           </Reveal>
         </div>
+        <Reveal delay={0.12}>
+          <p className="mx-auto mt-5 max-w-2xl text-balance text-center text-sm leading-snug text-muted-foreground sm:text-base">
+            On screen: timeline kanban — 14 days of promos at a glance. Click any card to expand the inline ACMS editor.
+          </p>
+        </Reveal>
         <Reveal delay={0.15}>
           <div className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:mt-14">
             <Button asChild size="lg" data-icon="inline-end">
@@ -329,12 +347,10 @@ function FramePreview({
   nativeWidth,
   nativeHeight,
   ariaLabel,
-  caption,
 }: {
   nativeWidth: number
   nativeHeight: number
   ariaLabel: string
-  caption?: string
 }) {
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   // Initial scale is a reasonable fallback before the ResizeObserver fires
@@ -381,9 +397,6 @@ function FramePreview({
           />
         </div>
       </Card>
-      {caption ? (
-        <p className="mt-3 text-sm leading-snug text-muted-foreground">{caption}</p>
-      ) : null}
     </div>
   )
 }
