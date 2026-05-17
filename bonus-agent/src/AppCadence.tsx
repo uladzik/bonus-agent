@@ -263,15 +263,15 @@ function Hero() {
 /* ── see it in action ──────────────────────────────────────────────────────
    Two live iframes of the dashboard, sized to actual device proportions:
    desktop at 1280×720 (HD), mobile at 375×812 (iPhone X-class). On lg+ the
-   grid is `[3.85fr_1fr]` — that's exactly (1280/720) / (375/812), the only
-   ratio that makes both cards land on the SAME visible height while each
-   keeping its native aspect. The two iframes then scale to fill their own
-   card width, so both end up at a comparable zoom (≈0.65–0.70 on a MacBook
-   Pro 14): the desktop view reads at a comfortable size for the eye, and
-   the phone view shrinks below native so it doesn't feel oversized next
-   to the laptop. On < lg the row collapses into a stack; each card caps
-   its own max-width (`640` / `280`) so the desktop preview still looks
-   like a screen and the phone still looks like a phone. */
+   phone column is fixed at 240 px so the mobile card stays visually compact
+   (≈520 px tall) instead of stretching to match the desktop's height — the
+   prior `[3.85fr_1fr]` ratio equalised heights but made the phone read as
+   an awkwardly tall panel. The desktop column fills the remaining space;
+   `items-end` bottom-aligns the two previews so they share a baseline.
+   On < lg the row collapses into a stack; each card caps its own max-width
+   (`640` / `240`) so the desktop preview still looks like a screen and the
+   phone still looks like a phone. A short caption under each preview names
+   the screen so the reader knows what they're looking at. */
 function SeeItInAction() {
   return (
     <section id="demo" className="scroll-mt-20 py-14 sm:py-20">
@@ -281,19 +281,21 @@ function SeeItInAction() {
           title="The dashboard the operator actually uses."
           subtitle="Two live previews of the same tool — desktop on the left, mobile on the right. Both are interactive: click the timeline, expand a campaign, edit any field."
         />
-        <div className="mt-12 grid grid-cols-1 items-center justify-items-center gap-6 lg:mt-14 lg:grid-cols-[3.85fr_1fr] lg:items-start lg:justify-items-stretch">
+        <div className="mt-12 grid grid-cols-1 items-center justify-items-center gap-6 lg:mt-14 lg:grid-cols-[1fr_240px] lg:items-end lg:justify-items-stretch">
           <Reveal delay={0.05} className="w-full max-w-[640px] lg:max-w-none">
             <FramePreview
               nativeWidth={1280}
               nativeHeight={720}
               ariaLabel="Live desktop preview of Bonus Agent dashboard"
+              caption="Timeline kanban — 14 days of promos in one view. Click any card to expand the inline ACMS editor."
             />
           </Reveal>
-          <Reveal delay={0.08} className="w-full max-w-[280px] lg:max-w-none">
+          <Reveal delay={0.08} className="w-full max-w-[240px] lg:max-w-none">
             <FramePreview
               nativeWidth={375}
               nativeHeight={812}
               ariaLabel="Live mobile preview of Bonus Agent dashboard"
+              caption="Same dashboard on mobile — every field, one-tap edit."
             />
           </Reveal>
         </div>
@@ -327,10 +329,12 @@ function FramePreview({
   nativeWidth,
   nativeHeight,
   ariaLabel,
+  caption,
 }: {
   nativeWidth: number
   nativeHeight: number
   ariaLabel: string
+  caption?: string
 }) {
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   // Initial scale is a reasonable fallback before the ResizeObserver fires
@@ -349,33 +353,38 @@ function FramePreview({
   }, [nativeWidth])
 
   return (
-    <Card className="overflow-hidden">
-      <div className="flex items-center gap-1.5 border-b border-border px-4 py-3">
-        <span className="size-3 rounded-full bg-foreground/15" />
-        <span className="size-3 rounded-full bg-foreground/15" />
-        <span className="size-3 rounded-full bg-foreground/15" />
-        <span className="ml-3 truncate font-mono text-xs text-muted-foreground">
-          bonus-agent-demo.pages.dev
-        </span>
-      </div>
-      <div
-        ref={wrapperRef}
-        className="relative overflow-hidden bg-surface-1"
-        style={{ aspectRatio: `${nativeWidth} / ${nativeHeight}` }}
-      >
-        <iframe
-          src={DASHBOARD_URL}
-          title={ariaLabel}
-          loading="lazy"
-          className="absolute left-0 top-0 origin-top-left border-0"
-          style={{
-            width: `${nativeWidth}px`,
-            height: `${nativeHeight}px`,
-            transform: `scale(${scale})`,
-          }}
-        />
-      </div>
-    </Card>
+    <div>
+      <Card className="overflow-hidden">
+        <div className="flex items-center gap-1.5 border-b border-border px-4 py-3">
+          <span className="size-3 rounded-full bg-foreground/15" />
+          <span className="size-3 rounded-full bg-foreground/15" />
+          <span className="size-3 rounded-full bg-foreground/15" />
+          <span className="ml-3 truncate font-mono text-xs text-muted-foreground">
+            bonus-agent-demo.pages.dev
+          </span>
+        </div>
+        <div
+          ref={wrapperRef}
+          className="relative overflow-hidden bg-surface-1"
+          style={{ aspectRatio: `${nativeWidth} / ${nativeHeight}` }}
+        >
+          <iframe
+            src={DASHBOARD_URL}
+            title={ariaLabel}
+            loading="lazy"
+            className="absolute left-0 top-0 origin-top-left border-0"
+            style={{
+              width: `${nativeWidth}px`,
+              height: `${nativeHeight}px`,
+              transform: `scale(${scale})`,
+            }}
+          />
+        </div>
+      </Card>
+      {caption ? (
+        <p className="mt-3 text-sm leading-snug text-muted-foreground">{caption}</p>
+      ) : null}
+    </div>
   )
 }
 
