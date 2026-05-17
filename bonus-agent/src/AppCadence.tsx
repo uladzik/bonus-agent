@@ -261,17 +261,17 @@ function Hero() {
 }
 
 /* ── see it in action ──────────────────────────────────────────────────────
-   Two equal-sized live iframes of the dashboard side-by-side: desktop on
-   the left, mobile-breakpoint on the right. Both cards share the same
-   macOS-window chrome and the same `aspect-[4/3]` so the blocks read as a
-   matched pair. The desktop iframe is rendered at a 1280-px native viewport
-   and scaled down to its container via ResizeObserver — that's the only way
-   to force the dashboard's desktop layout inside a card that's narrower than
-   the desktop breakpoint. The mobile iframe is fixed at 390 px wide and
-   centered, so the dashboard naturally renders its mobile breakpoint with
-   no upscale blur. `bonus-agent-demo.pages.dev` ships no framing-restricted
-   headers, so embedding is permitted. Section closes with the centered
-   "Open the live dashboard" CTA that breaks out into a full-window view. */
+   Two live iframes of the dashboard, sized to actual device proportions:
+   desktop at 1280×720 (HD), mobile at 375×812 (iPhone X-class). On lg+ the
+   grid is `[3.85fr_1fr]` — that's exactly (1280/720) / (375/812), the only
+   ratio that makes both cards land on the SAME visible height while each
+   keeping its native aspect. The two iframes then scale to fill their own
+   card width, so both end up at a comparable zoom (≈0.65–0.70 on a MacBook
+   Pro 14): the desktop view reads at a comfortable size for the eye, and
+   the phone view shrinks below native so it doesn't feel oversized next
+   to the laptop. On < lg the row collapses into a stack; each card caps
+   its own max-width (`640` / `280`) so the desktop preview still looks
+   like a screen and the phone still looks like a phone. */
 function SeeItInAction() {
   return (
     <section id="demo" className="scroll-mt-20 py-14 sm:py-20">
@@ -281,15 +281,20 @@ function SeeItInAction() {
           title="The dashboard the operator actually uses."
           subtitle="Two live previews of the same tool — desktop on the left, mobile on the right. Both are interactive: click the timeline, expand a campaign, edit any field."
         />
-        {/* 50/50 grid on lg+, stacked on < lg. `gap-6` matches the inter-card
-            rhythm used by ProblemFix / Economics so the section reads as part
-            of the page's standard cadence rather than wider/looser. */}
-        <div className="mt-12 grid grid-cols-1 items-stretch gap-6 lg:mt-14 lg:grid-cols-2">
-          <Reveal delay={0.05}>
-            <FramePreview variant="desktop" ariaLabel="Live desktop preview of Bonus Agent dashboard" />
+        <div className="mt-12 grid grid-cols-1 items-center justify-items-center gap-6 lg:mt-14 lg:grid-cols-[3.85fr_1fr] lg:items-start lg:justify-items-stretch">
+          <Reveal delay={0.05} className="w-full max-w-[640px] lg:max-w-none">
+            <FramePreview
+              nativeWidth={1280}
+              nativeHeight={720}
+              ariaLabel="Live desktop preview of Bonus Agent dashboard"
+            />
           </Reveal>
-          <Reveal delay={0.08}>
-            <FramePreview variant="mobile" ariaLabel="Live mobile preview of Bonus Agent dashboard" />
+          <Reveal delay={0.08} className="w-full max-w-[280px] lg:max-w-none">
+            <FramePreview
+              nativeWidth={375}
+              nativeHeight={812}
+              ariaLabel="Live mobile preview of Bonus Agent dashboard"
+            />
           </Reveal>
         </div>
         <Reveal delay={0.15}>
@@ -307,37 +312,41 @@ function SeeItInAction() {
   )
 }
 
-/* Window-chrome card wrapping a live <iframe> to the dashboard. The desktop
-   variant uses ResizeObserver to compute a CSS `scale()` factor that maps a
-   1280-px native iframe down to the actual card width — this is the cleanest
-   way to keep the dashboard's desktop breakpoint visible inside a smaller
-   container without depending on the iframe content's responsive logic. The
-   mobile variant skips scaling entirely: a 390-px-wide iframe sitting
-   centered in the card renders the dashboard's mobile layout at native size
-   with breathing room on the sides. */
-const DESKTOP_VIEWPORT_WIDTH = 1280
+/* Window-chrome card wrapping a live <iframe> rendered at a chosen native
+   viewport (`nativeWidth` × `nativeHeight`) and scaled via ResizeObserver
+   to exactly fill the card width. The card's own aspect ratio is derived
+   from the native dimensions so the iframe always fills the surface with
+   no letterboxing, regardless of viewport.
 
+   Used for both desktop (1280×720) and mobile (375×812) variants — the
+   only difference is the native size passed in. Scaling preserves
+   readability across viewports: the dashboard renders ONCE at the chosen
+   breakpoint and is then zoomed visually, instead of forcing its
+   responsive logic to re-flow at an awkward container width. */
 function FramePreview({
-  variant,
+  nativeWidth,
+  nativeHeight,
   ariaLabel,
 }: {
-  variant: "desktop" | "mobile"
+  nativeWidth: number
+  nativeHeight: number
   ariaLabel: string
 }) {
   const wrapperRef = useRef<HTMLDivElement | null>(null)
-  const [scale, setScale] = useState(0.45)
+  // Initial scale is a reasonable fallback before the ResizeObserver fires
+  // so the iframe isn't rendered at 1× and overflowing for one paint.
+  const [scale, setScale] = useState(0.5)
 
   useEffect(() => {
-    if (variant !== "desktop") return
     const el = wrapperRef.current
     if (!el || typeof ResizeObserver === "undefined") return
     const ro = new ResizeObserver((entries) => {
       const w = entries[0]?.contentRect.width
-      if (w && w > 0) setScale(w / DESKTOP_VIEWPORT_WIDTH)
+      if (w && w > 0) setScale(w / nativeWidth)
     })
     ro.observe(el)
     return () => ro.disconnect()
-  }, [variant])
+  }, [nativeWidth])
 
   return (
     <Card className="overflow-hidden">
@@ -349,30 +358,22 @@ function FramePreview({
           bonus-agent-demo.pages.dev
         </span>
       </div>
-      <div ref={wrapperRef} className="relative aspect-[4/3] overflow-hidden bg-surface-1">
-        {variant === "desktop" ? (
-          <iframe
-            src={DASHBOARD_URL}
-            title={ariaLabel}
-            loading="lazy"
-            className="absolute left-0 top-0 origin-top-left border-0"
-            style={{
-              width: `${DESKTOP_VIEWPORT_WIDTH}px`,
-              /* iframe rendered at aspect-[4/3] inside the card — height is
-                 derived so the scaled iframe covers the card area exactly. */
-              height: `${(DESKTOP_VIEWPORT_WIDTH * 3) / 4}px`,
-              transform: `scale(${scale})`,
-            }}
-          />
-        ) : (
-          <iframe
-            src={DASHBOARD_URL}
-            title={ariaLabel}
-            loading="lazy"
-            className="absolute left-1/2 top-0 h-full -translate-x-1/2 border-0"
-            style={{ width: "390px" }}
-          />
-        )}
+      <div
+        ref={wrapperRef}
+        className="relative overflow-hidden bg-surface-1"
+        style={{ aspectRatio: `${nativeWidth} / ${nativeHeight}` }}
+      >
+        <iframe
+          src={DASHBOARD_URL}
+          title={ariaLabel}
+          loading="lazy"
+          className="absolute left-0 top-0 origin-top-left border-0"
+          style={{
+            width: `${nativeWidth}px`,
+            height: `${nativeHeight}px`,
+            transform: `scale(${scale})`,
+          }}
+        />
       </div>
     </Card>
   )
