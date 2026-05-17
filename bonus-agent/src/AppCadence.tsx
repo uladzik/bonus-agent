@@ -28,7 +28,7 @@ import { ThemeSwitch } from "@/components/ui/theme-switch"
 import { CadencePipeline, FlowConnector } from "@/components/sections/cadence-pipeline"
 import { LocaleProvider, useCopy } from "@/copy"
 
-const TELEGRAM_URL = "https://t.me/blabbing"
+const TELEGRAM_URL = "https://t.me/upreadydev"
 /* New Cadencio dashboard (`~/repos/agentbonus/cademcio`, branch
    `cadencio-2026-05-17`). Runs on `next dev -p 3002`. The previously
    deployed `bonus-agent-demo.pages.dev` is the older version and is
