@@ -295,22 +295,22 @@ function SeeItInAction() {
     {
       caption: "Timeline on mobile",
       sub: "Same kanban, fits in one hand — swipe between days.",
-      // src: "/screenshots/mobile/01-timeline.png",
+      src: "/screenshots/mobile/01-timeline.png",
     },
     {
       caption: "Editor on mobile",
       sub: "Every ACMS field, single-tap to edit. Chip multi-select adapted for thumbs.",
-      // src: "/screenshots/mobile/02-editor.png",
+      src: "/screenshots/mobile/02-editor.png",
     },
     {
       caption: "Run-fill on mobile",
       sub: "Watch fields populate; flagged values surfaced inline for quick review.",
-      // src: "/screenshots/mobile/03-runfill.png",
+      src: "/screenshots/mobile/03-runfill.png",
     },
     {
       caption: "Handoff on mobile",
       sub: "Tap to copy the Telegram message; share-sheet sends it to the operator.",
-      // src: "/screenshots/mobile/04-handoff.png",
+      src: "/screenshots/mobile/04-handoff.png",
     },
   ]
   return (
@@ -403,9 +403,14 @@ function ScreenshotCarousel({
       onBlur={() => setPaused(false)}
     >
       {variant === "desktop" ? (
-        <DesktopFrame shots={shots} index={index} />
+        <WindowFrame shots={shots} index={index} aspect="aspect-video" />
       ) : (
-        <MobileFrame shots={shots} index={index} />
+        <WindowFrame
+          shots={shots}
+          index={index}
+          aspect="aspect-[1170/1992]"
+          containerClassName="mx-auto max-w-[300px]"
+        />
       )}
       {/* Caption strip — min-height keeps the dots stable across slides with
           1-line vs 2-line sub-copy so the layout never jumps. */}
@@ -437,9 +442,23 @@ function ScreenshotCarousel({
   )
 }
 
-function DesktopFrame({ shots, index }: { shots: Shot[]; index: number }) {
+/* One frame for both desktop and mobile carousels — same Card chrome
+   (traffic-light dots + URL bar), only the inner aspect ratio differs.
+   The phone bezel/notch mockup is gone: per the brief, both surfaces
+   read as the same "tool window", scaled to their native aspect. */
+function WindowFrame({
+  shots,
+  index,
+  aspect,
+  containerClassName,
+}: {
+  shots: Shot[]
+  index: number
+  aspect: string
+  containerClassName?: string
+}) {
   return (
-    <Card className="mx-auto overflow-hidden">
+    <Card className={`overflow-hidden ${containerClassName ?? "mx-auto"}`}>
       <div className="flex items-center gap-1.5 border-b border-border px-4 py-3">
         <span className="size-3 rounded-full bg-foreground/15" />
         <span className="size-3 rounded-full bg-foreground/15" />
@@ -448,28 +467,10 @@ function DesktopFrame({ shots, index }: { shots: Shot[]; index: number }) {
           bonus-agent-demo.pages.dev
         </span>
       </div>
-      <div className="relative aspect-video overflow-hidden bg-surface-1">
+      <div className={`relative ${aspect} overflow-hidden bg-surface-1`}>
         <SlideStrip shots={shots} index={index} />
       </div>
     </Card>
-  )
-}
-
-function MobileFrame({ shots, index }: { shots: Shot[]; index: number }) {
-  // Phone aspect ~9:19.5 (iPhone-class). Bezel built with nested borders so
-  // the inner screen has its own clip-rounded corners.
-  return (
-    <div className="mx-auto w-full max-w-[260px] sm:max-w-[280px]">
-      <div className="relative aspect-[9/19.5] overflow-hidden rounded-[2.5rem] border-[10px] border-foreground/85 bg-foreground/85 shadow-2xl">
-        <div
-          aria-hidden
-          className="absolute left-1/2 top-0 z-10 h-5 w-24 -translate-x-1/2 rounded-b-2xl bg-foreground/85"
-        />
-        <div className="relative size-full overflow-hidden rounded-[1.75rem] bg-surface-1">
-          <SlideStrip shots={shots} index={index} />
-        </div>
-      </div>
-    </div>
   )
 }
 
