@@ -296,7 +296,7 @@ function SeeItInAction() {
           className="max-w-5xl"
           titleClassName="lg:whitespace-nowrap"
         />
-        <div className="mt-12 grid grid-cols-1 items-center justify-items-center gap-6 lg:mt-14 lg:grid-cols-[3.85fr_1fr] lg:items-start lg:justify-items-stretch">
+        <div className="mt-12 grid grid-cols-1 items-start justify-items-center gap-6 lg:mt-14 lg:grid-cols-[3fr_1fr] lg:justify-items-stretch">
           <Reveal delay={0.05} className="w-full max-w-[640px] lg:max-w-none">
             <FramePreview
               nativeWidth={1280}
@@ -381,8 +381,7 @@ function FramePreview({
         </div>
         <div
           ref={wrapperRef}
-          className="relative overflow-hidden bg-surface-1"
-          style={{ aspectRatio: `${nativeWidth} / ${nativeHeight}` }}
+          className="relative h-[350px] overflow-hidden bg-surface-1 lg:h-[450px]"
         >
           <iframe
             src={DASHBOARD_URL}
