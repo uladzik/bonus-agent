@@ -21,7 +21,6 @@ import {
   AnalyticsUpIcon,
   BookOpen01Icon,
   Compass01Icon,
-  PlayCircle02Icon,
   ArrowRight01Icon,
 } from "@hugeicons/core-free-icons"
 import { Button } from "@/components/ui/button"
@@ -63,6 +62,7 @@ function AppCadenceInner() {
       <CadenceNav />
       <main className="relative flex flex-1 flex-col">
         <Hero />
+        <SeeItInAction />
         <HowItWorks />
         <ProblemFix />
         <Economics />
@@ -212,42 +212,26 @@ function Hero() {
   return (
     <section className="pb-12 pt-10 sm:pb-16 sm:pt-12">
       <div className={SHELL}>
-        {/* lg+: 7/5 split — text + CTAs on the left, video poster on the right.
-            Mobile: single column, poster falls below the CTA row.
-            Stats keep their full-width 3-col row below the split. */}
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
-          <div className="lg:col-span-7">
-            <Reveal delay={0.05}>
-              <h1 className="mt-6 max-w-4xl text-balance text-4xl font-semibold leading-[1.05] text-foreground sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
-                {hero.titleHead} {hero.titleTail}
-              </h1>
-            </Reveal>
-            <Reveal delay={0.1}>
-              <p className="mt-6 max-w-2xl text-balance text-lg leading-relaxed text-muted-foreground sm:text-xl">
-                {hero.sub}
-              </p>
-            </Reveal>
-            <Reveal delay={0.15}>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Button asChild size="lg" data-icon="inline-end">
-                  <a href={DASHBOARD_URL} target="_blank" rel="noreferrer">
-                    Open live dashboard
-                    <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
-                  </a>
-                </Button>
-                <Button asChild variant="outline" size="lg" data-icon="inline-start">
-                  <a href="#demo-video">
-                    <HugeiconsIcon icon={PlayCircle02Icon} className="size-4" />
-                    Watch 90-second demo
-                  </a>
-                </Button>
-              </div>
-            </Reveal>
+        <Reveal delay={0.05}>
+          <h1 className="mt-6 max-w-4xl text-balance text-4xl font-semibold leading-[1.05] text-foreground sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
+            {hero.titleHead} {hero.titleTail}
+          </h1>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p className="mt-6 max-w-2xl text-balance text-lg leading-relaxed text-muted-foreground sm:text-xl">
+            {hero.sub}
+          </p>
+        </Reveal>
+        <Reveal delay={0.15}>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Button asChild size="lg" data-icon="inline-end">
+              <a href={DASHBOARD_URL} target="_blank" rel="noreferrer">
+                Open live dashboard
+                <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
+              </a>
+            </Button>
           </div>
-          <Reveal delay={0.2} className="lg:col-span-5">
-            <DemoVideoPoster />
-          </Reveal>
-        </div>
+        </Reveal>
         {/* Stat tiles — 3 equal columns on sm+ (mobile stacks 1-col).
             Number type scales by viewport: text-3xl on mobile / sm
             (narrow 3-col columns ≈ 150–200 px would wrap a text-5xl
@@ -271,49 +255,102 @@ function Hero() {
   )
 }
 
-/* ── demo video poster ────────────────────────────────────────────────────
-   Clickable 16:9 placeholder card living in the Hero right column. No video
-   wired up yet — clicking opens the live dashboard in a new tab as the most
-   useful no-op fallback. Replace the inner <a> with a modal/iframe player
-   once the actual recording is uploaded.
-
-   Visual: surface-1 card · faint grid backdrop · centered play button +
-   label below. Hover lifts the play button's bg and brings the ring closer
-   so the affordance is obvious without animation cost. */
-function DemoVideoPoster() {
+/* ── see it in action ──────────────────────────────────────────────────────
+   Lives in second position (between Hero and HowItWorks) — showcases the
+   actual dashboard via screenshots, then converts with a big CTA to the
+   live demo. Each card is a macOS-window mockup (traffic-light dots + URL
+   bar + 16:9 image slot). Image slot currently renders a placeholder; drop
+   real screenshots into /public/screenshots/ and replace the placeholder
+   <div> with <img src="/screenshots/X.png" alt="…" className="absolute
+   inset-0 size-full object-cover" /> when ready. */
+function SeeItInAction() {
+  const shots: { caption: string; sub: string; src?: string }[] = [
+    {
+      caption: "Timeline kanban — one column per day",
+      sub: "14-day promo calendar at a glance; click any card to expand the editor inline.",
+      // src: "/screenshots/timeline.png",
+    },
+    {
+      caption: "Inline editor — 25+ ACMS fields, pre-filled",
+      sub: "Notion-style chips for audience and geo; gray rows = derived values worth a glance.",
+      // src: "/screenshots/editor.png",
+    },
+  ]
   return (
-    <a
-      id="demo-video"
-      href={DASHBOARD_URL}
-      target="_blank"
-      rel="noreferrer"
-      aria-label="Watch the Bonus Agent demo"
-      className="group/poster relative block aspect-video w-full overflow-hidden rounded-2xl border border-border bg-surface-1 transition-colors hover:border-foreground/30"
-    >
-      {/* Faint grid backdrop — same vocabulary as cdn-backdrop but tighter,
-          so the empty poster doesn't read as a broken image. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] [background-size:32px_32px]"
-      />
-      {/* Top eyebrow — frames the card as a recorded demo, not a hero image. */}
-      <div className="absolute left-5 top-5 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        <span className="inline-block size-1.5 rounded-full bg-foreground/60" />
-        Live demo · ~90 sec
+    <section id="demo" className="scroll-mt-20 py-14 sm:py-20">
+      <div className={SHELL}>
+        <SectionHeader
+          eyebrow="See it in action"
+          title="The dashboard the operator actually uses."
+          subtitle="Two views from the live tool — the timeline you plan on, and the editor that writes every ACMS field for you."
+        />
+        <div className="mt-12 grid grid-cols-1 gap-6 lg:mt-14 lg:grid-cols-2 lg:gap-8">
+          {shots.map((shot, i) => (
+            <Reveal key={shot.caption} delay={0.05 + i * 0.06}>
+              <ScreenshotCard {...shot} />
+            </Reveal>
+          ))}
+        </div>
+        <Reveal delay={0.2}>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:mt-12">
+            <Button asChild size="lg" data-icon="inline-end">
+              <a href={DASHBOARD_URL} target="_blank" rel="noreferrer">
+                Open the live dashboard
+                <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
+              </a>
+            </Button>
+          </div>
+        </Reveal>
       </div>
-      {/* Center: play button + label */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-        <span className="inline-flex size-16 items-center justify-center rounded-full border border-border bg-background/80 text-foreground transition-all group-hover/poster:scale-105 group-hover/poster:border-foreground/40 sm:size-20">
-          <HugeiconsIcon icon={PlayCircle02Icon} className="size-8 sm:size-10" />
-        </span>
-        <span className="text-sm font-medium text-foreground sm:text-base">
-          See the agent fill 25+ ACMS fields
-        </span>
-        <span className="text-xs text-muted-foreground sm:text-sm">
-          Opens the live dashboard in a new tab
+    </section>
+  )
+}
+
+function ScreenshotCard({
+  caption,
+  sub,
+  src,
+}: {
+  caption: string
+  sub: string
+  src?: string
+}) {
+  return (
+    <Card className="overflow-hidden">
+      {/* macOS-window chrome */}
+      <div className="flex items-center gap-1.5 border-b border-border px-4 py-3">
+        <span className="size-3 rounded-full bg-foreground/15" />
+        <span className="size-3 rounded-full bg-foreground/15" />
+        <span className="size-3 rounded-full bg-foreground/15" />
+        <span className="ml-3 truncate font-mono text-xs text-muted-foreground">
+          bonus-agent-demo.pages.dev
         </span>
       </div>
-    </a>
+      {/* 16:9 image slot — placeholder until a real screenshot is dropped in */}
+      <div className="relative aspect-video bg-surface-1">
+        {src ? (
+          <img
+            src={src}
+            alt={caption}
+            className="absolute inset-0 size-full object-cover"
+          />
+        ) : (
+          <>
+            <div
+              aria-hidden
+              className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] [background-size:24px_24px]"
+            />
+            <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Screenshot placeholder
+            </div>
+          </>
+        )}
+      </div>
+      <div className="border-t border-border px-5 py-4 sm:px-6 sm:py-5">
+        <div className="text-base font-medium text-foreground sm:text-lg">{caption}</div>
+        <div className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{sub}</div>
+      </div>
+    </Card>
   )
 }
 
