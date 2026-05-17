@@ -256,15 +256,16 @@ function Hero() {
 }
 
 /* ── see it in action ──────────────────────────────────────────────────────
-   Lives in second position (between Hero and HowItWorks) — showcases the
-   actual dashboard via screenshots, then converts with a big CTA to the
-   live demo. Each card is a macOS-window mockup (traffic-light dots + URL
-   bar + 16:9 image slot). Image slot currently renders a placeholder; drop
-   real screenshots into /public/screenshots/ and replace the placeholder
-   <div> with <img src="/screenshots/X.png" alt="…" className="absolute
-   inset-0 size-full object-cover" /> when ready. */
+   Two stacked auto-advancing carousels: desktop (macOS-window frame, 16:9)
+   on top, mobile (phone mockup, 9:19.5) below. Each ticks every 2 s, pauses
+   on hover/focus, respects prefers-reduced-motion, and exposes click-to-jump
+   dots. The desktop strip reads /public/screenshots/0{1-4}-*.png; mobile
+   shots are placeholders until files land in /public/screenshots/mobile/.
+   Section closes with the centered "Open the live dashboard" CTA. */
+type Shot = { caption: string; sub: string; src?: string }
+
 function SeeItInAction() {
-  const shots: { caption: string; sub: string; src?: string }[] = [
+  const desktopShots: Shot[] = [
     {
       caption: "Timeline kanban — one column per day",
       sub: "14-day promo calendar at a glance; click any card to expand the editor inline.",
@@ -286,23 +287,60 @@ function SeeItInAction() {
       src: "/screenshots/04-handoff.png",
     },
   ]
+  /* Mobile placeholders — once mobile screenshots land in
+     /public/screenshots/mobile/, set `src` on each entry below. Same captions
+     mirror the desktop story so the section reads as the same tool, two
+     surfaces. */
+  const mobileShots: Shot[] = [
+    {
+      caption: "Timeline on mobile",
+      sub: "Same kanban, fits in one hand — swipe between days.",
+      // src: "/screenshots/mobile/01-timeline.png",
+    },
+    {
+      caption: "Editor on mobile",
+      sub: "Every ACMS field, single-tap to edit. Chip multi-select adapted for thumbs.",
+      // src: "/screenshots/mobile/02-editor.png",
+    },
+    {
+      caption: "Run-fill on mobile",
+      sub: "Watch fields populate; flagged values surfaced inline for quick review.",
+      // src: "/screenshots/mobile/03-runfill.png",
+    },
+    {
+      caption: "Handoff on mobile",
+      sub: "Tap to copy the Telegram message; share-sheet sends it to the operator.",
+      // src: "/screenshots/mobile/04-handoff.png",
+    },
+  ]
   return (
     <section id="demo" className="scroll-mt-20 py-14 sm:py-20">
       <div className={SHELL}>
         <SectionHeader
           eyebrow="See it in action"
           title="The dashboard the operator actually uses."
-          subtitle="Two views from the live tool — the timeline you plan on, and the editor that writes every ACMS field for you."
+          subtitle="Same tool, two surfaces. Each carousel auto-advances every 2 seconds — hover to pause, click a dot to jump."
         />
-        <div className="mt-12 grid grid-cols-1 gap-6 lg:mt-14 lg:grid-cols-2 lg:gap-8">
-          {shots.map((shot, i) => (
-            <Reveal key={shot.caption} delay={0.05 + i * 0.06}>
-              <ScreenshotCard {...shot} />
-            </Reveal>
-          ))}
+        <div className="mt-12 lg:mt-14">
+          <Reveal delay={0.05}>
+            <ScreenshotCarousel
+              shots={desktopShots}
+              variant="desktop"
+              ariaLabel="Desktop dashboard screenshots"
+            />
+          </Reveal>
         </div>
-        <Reveal delay={0.2}>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:mt-12">
+        <div className="mt-14 sm:mt-20">
+          <Reveal delay={0.05}>
+            <ScreenshotCarousel
+              shots={mobileShots}
+              variant="mobile"
+              ariaLabel="Mobile dashboard screenshots"
+            />
+          </Reveal>
+        </div>
+        <Reveal delay={0.15}>
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:mt-14">
             <Button asChild size="lg" data-icon="inline-end">
               <a href={DASHBOARD_URL} target="_blank" rel="noreferrer">
                 Open the live dashboard
@@ -316,18 +354,87 @@ function SeeItInAction() {
   )
 }
 
-function ScreenshotCard({
-  caption,
-  sub,
-  src,
+function ScreenshotCarousel({
+  shots,
+  variant,
+  ariaLabel,
+  intervalMs = 2000,
 }: {
-  caption: string
-  sub: string
-  src?: string
+  shots: Shot[]
+  variant: "desktop" | "mobile"
+  ariaLabel: string
+  intervalMs?: number
 }) {
+  const [index, setIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
+
+  // Honor the OS-level reduced-motion preference — disables auto-advance,
+  // dots still work as manual nav.
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)")
+    setReducedMotion(mq.matches)
+    const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
+    mq.addEventListener("change", onChange)
+    return () => mq.removeEventListener("change", onChange)
+  }, [])
+
+  useEffect(() => {
+    if (paused || reducedMotion || shots.length <= 1) return
+    const t = setInterval(() => setIndex((i) => (i + 1) % shots.length), intervalMs)
+    return () => clearInterval(t)
+  }, [paused, reducedMotion, shots.length, intervalMs])
+
+  const current = shots[index]
   return (
-    <Card className="overflow-hidden">
-      {/* macOS-window chrome */}
+    <div
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={ariaLabel}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+    >
+      {variant === "desktop" ? (
+        <DesktopFrame shots={shots} index={index} />
+      ) : (
+        <MobileFrame shots={shots} index={index} />
+      )}
+      {/* Caption strip — min-height keeps the dots stable across slides with
+          1-line vs 2-line sub-copy so the layout never jumps. */}
+      <div className="mx-auto mt-5 max-w-2xl min-h-[4rem] text-center sm:mt-6">
+        <div className="text-base font-medium text-foreground sm:text-lg" aria-live="polite">
+          {current.caption}
+        </div>
+        <div className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{current.sub}</div>
+      </div>
+      <div className="mt-4 flex justify-center gap-1.5" role="tablist" aria-label={ariaLabel}>
+        {shots.map((s, i) => (
+          <button
+            key={s.caption}
+            type="button"
+            role="tab"
+            aria-selected={i === index}
+            aria-label={`Show screen ${i + 1} of ${shots.length}`}
+            onClick={() => setIndex(i)}
+            className={
+              "h-1.5 rounded-full transition-all " +
+              (i === index
+                ? "w-6 bg-foreground"
+                : "w-1.5 bg-foreground/25 hover:bg-foreground/50")
+            }
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function DesktopFrame({ shots, index }: { shots: Shot[]; index: number }) {
+  return (
+    <Card className="mx-auto overflow-hidden">
       <div className="flex items-center gap-1.5 border-b border-border px-4 py-3">
         <span className="size-3 rounded-full bg-foreground/15" />
         <span className="size-3 rounded-full bg-foreground/15" />
@@ -336,31 +443,60 @@ function ScreenshotCard({
           bonus-agent-demo.pages.dev
         </span>
       </div>
-      {/* 16:9 image slot — placeholder until a real screenshot is dropped in */}
-      <div className="relative aspect-video bg-surface-1">
-        {src ? (
-          <img
-            src={src}
-            alt={caption}
-            className="absolute inset-0 size-full object-cover"
-          />
-        ) : (
-          <>
-            <div
-              aria-hidden
-              className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] [background-size:24px_24px]"
-            />
-            <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Screenshot placeholder
-            </div>
-          </>
-        )}
-      </div>
-      <div className="border-t border-border px-5 py-4 sm:px-6 sm:py-5">
-        <div className="text-base font-medium text-foreground sm:text-lg">{caption}</div>
-        <div className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{sub}</div>
+      <div className="relative aspect-video overflow-hidden bg-surface-1">
+        <SlideStrip shots={shots} index={index} />
       </div>
     </Card>
+  )
+}
+
+function MobileFrame({ shots, index }: { shots: Shot[]; index: number }) {
+  // Phone aspect ~9:19.5 (iPhone-class). Bezel built with nested borders so
+  // the inner screen has its own clip-rounded corners.
+  return (
+    <div className="mx-auto w-full max-w-[300px] sm:max-w-[320px]">
+      <div className="relative aspect-[9/19.5] overflow-hidden rounded-[2.5rem] border-[10px] border-foreground/85 bg-foreground/85 shadow-2xl">
+        <div
+          aria-hidden
+          className="absolute left-1/2 top-0 z-10 h-5 w-24 -translate-x-1/2 rounded-b-2xl bg-foreground/85"
+        />
+        <div className="relative size-full overflow-hidden rounded-[1.75rem] bg-surface-1">
+          <SlideStrip shots={shots} index={index} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SlideStrip({ shots, index }: { shots: Shot[]; index: number }) {
+  return (
+    <div
+      className="flex size-full transition-transform duration-500 ease-out"
+      style={{ transform: `translateX(-${index * 100}%)` }}
+    >
+      {shots.map((shot, i) => (
+        <div key={shot.caption} className="relative size-full shrink-0 basis-full">
+          {shot.src ? (
+            <img
+              src={shot.src}
+              alt={shot.caption}
+              loading={i === 0 ? "eager" : "lazy"}
+              className="absolute inset-0 size-full object-cover"
+            />
+          ) : (
+            <>
+              <div
+                aria-hidden
+                className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] [background-size:24px_24px]"
+              />
+              <div className="absolute inset-0 flex items-center justify-center px-4 text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                Drop a file into /public/screenshots/
+              </div>
+            </>
+          )}
+        </div>
+      ))}
+    </div>
   )
 }
 
