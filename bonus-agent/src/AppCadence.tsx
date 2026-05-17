@@ -34,7 +34,7 @@ const TELEGRAM_URL = "https://t.me/upreadydev"
    deployed `bonus-agent-demo.pages.dev` is the older version and is
    not used here. Once the new dashboard is deployed, swap this to
    the public URL. */
-const DASHBOARD_URL = "http://127.0.0.1:3002"
+const DASHBOARD_URL = "https://cademcio.vercel.app"
 
 /* Icons for the "after the engagement" tier cards. Pulled out of COPY so the
    translated dictionaries stay pure strings — the icons don't change per
