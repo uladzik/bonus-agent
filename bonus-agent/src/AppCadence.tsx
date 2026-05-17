@@ -268,12 +268,22 @@ function SeeItInAction() {
     {
       caption: "Timeline kanban — one column per day",
       sub: "14-day promo calendar at a glance; click any card to expand the editor inline.",
-      // src: "/screenshots/timeline.png",
+      src: "/screenshots/01-timeline.png",
     },
     {
       caption: "Inline editor — 25+ ACMS fields, pre-filled",
       sub: "Notion-style chips for audience and geo; gray rows = derived values worth a glance.",
-      // src: "/screenshots/editor.png",
+      src: "/screenshots/02-editor.png",
+    },
+    {
+      caption: "Run-fill — the agent writes every field in real time",
+      sub: "Watch each ACMS parameter populate from the promo-calendar row, flagged values surfaced for review.",
+      src: "/screenshots/03-runfill.png",
+    },
+    {
+      caption: "Telegram handoff — operator-ready message",
+      sub: "Generated from the verified ACMS fields; copy, paste, send. No re-typing the campaign for the night shift.",
+      src: "/screenshots/04-handoff.png",
     },
   ]
   return (
