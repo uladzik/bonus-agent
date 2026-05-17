@@ -321,17 +321,22 @@ function SeeItInAction() {
           title="The dashboard the operator actually uses."
           subtitle="Same tool, two surfaces. Each carousel auto-advances every 2 seconds — hover to pause, click a dot to jump."
         />
-        <div className="mt-12 lg:mt-14">
-          <Reveal delay={0.05}>
+        {/* lg+: side-by-side on one row — desktop 2/3, mobile 1/3. The
+            narrower desktop column (≈760 px instead of full ≈1152 px) gives
+            the 4K screenshots more pixel headroom on retina so they read as
+            crisp instead of stretched. Mobile column caps the phone at
+            max-w-[280px] (set inside MobileFrame); items-center keeps both
+            carousels visually anchored to the section midline despite the
+            phone's taller aspect. < lg: collapses back to stacked. */}
+        <div className="mt-12 grid grid-cols-1 items-center gap-12 lg:mt-14 lg:grid-cols-3 lg:gap-10">
+          <Reveal delay={0.05} className="lg:col-span-2">
             <ScreenshotCarousel
               shots={desktopShots}
               variant="desktop"
               ariaLabel="Desktop dashboard screenshots"
             />
           </Reveal>
-        </div>
-        <div className="mt-14 sm:mt-20">
-          <Reveal delay={0.05}>
+          <Reveal delay={0.08} className="lg:col-span-1">
             <ScreenshotCarousel
               shots={mobileShots}
               variant="mobile"
@@ -454,7 +459,7 @@ function MobileFrame({ shots, index }: { shots: Shot[]; index: number }) {
   // Phone aspect ~9:19.5 (iPhone-class). Bezel built with nested borders so
   // the inner screen has its own clip-rounded corners.
   return (
-    <div className="mx-auto w-full max-w-[300px] sm:max-w-[320px]">
+    <div className="mx-auto w-full max-w-[260px] sm:max-w-[280px]">
       <div className="relative aspect-[9/19.5] overflow-hidden rounded-[2.5rem] border-[10px] border-foreground/85 bg-foreground/85 shadow-2xl">
         <div
           aria-hidden
