@@ -21,6 +21,8 @@ import {
   AnalyticsUpIcon,
   BookOpen01Icon,
   Compass01Icon,
+  PlayCircle02Icon,
+  ArrowRight01Icon,
 } from "@hugeicons/core-free-icons"
 import { Button } from "@/components/ui/button"
 import { ThemeSwitch } from "@/components/ui/theme-switch"
@@ -28,6 +30,7 @@ import { CadencePipeline, FlowConnector } from "@/components/sections/cadence-pi
 import { LocaleProvider, useCopy } from "@/copy"
 
 const TELEGRAM_URL = "https://t.me/blabbing"
+const DASHBOARD_URL = "https://bonus-agent-demo.pages.dev"
 
 /* Icons for the "after the engagement" tier cards. Pulled out of COPY so the
    translated dictionaries stay pure strings — the icons don't change per
@@ -209,16 +212,42 @@ function Hero() {
   return (
     <section className="pb-12 pt-10 sm:pb-16 sm:pt-12">
       <div className={SHELL}>
-        <Reveal delay={0.05}>
-          <h1 className="mt-6 max-w-4xl text-balance text-4xl font-semibold leading-[1.05] text-foreground sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
-            {hero.titleHead} {hero.titleTail}
-          </h1>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <p className="mt-6 max-w-2xl text-balance text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            {hero.sub}
-          </p>
-        </Reveal>
+        {/* lg+: 7/5 split — text + CTAs on the left, video poster on the right.
+            Mobile: single column, poster falls below the CTA row.
+            Stats keep their full-width 3-col row below the split. */}
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
+          <div className="lg:col-span-7">
+            <Reveal delay={0.05}>
+              <h1 className="mt-6 max-w-4xl text-balance text-4xl font-semibold leading-[1.05] text-foreground sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
+                {hero.titleHead} {hero.titleTail}
+              </h1>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="mt-6 max-w-2xl text-balance text-lg leading-relaxed text-muted-foreground sm:text-xl">
+                {hero.sub}
+              </p>
+            </Reveal>
+            <Reveal delay={0.15}>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Button asChild size="lg" data-icon="inline-end">
+                  <a href={DASHBOARD_URL} target="_blank" rel="noreferrer">
+                    Open live dashboard
+                    <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
+                  </a>
+                </Button>
+                <Button asChild variant="outline" size="lg" data-icon="inline-start">
+                  <a href="#demo-video">
+                    <HugeiconsIcon icon={PlayCircle02Icon} className="size-4" />
+                    Watch 90-second demo
+                  </a>
+                </Button>
+              </div>
+            </Reveal>
+          </div>
+          <Reveal delay={0.2} className="lg:col-span-5">
+            <DemoVideoPoster />
+          </Reveal>
+        </div>
         {/* Stat tiles — 3 equal columns on sm+ (mobile stacks 1-col).
             Number type scales by viewport: text-3xl on mobile / sm
             (narrow 3-col columns ≈ 150–200 px would wrap a text-5xl
@@ -239,6 +268,52 @@ function Hero() {
         </div>
       </div>
     </section>
+  )
+}
+
+/* ── demo video poster ────────────────────────────────────────────────────
+   Clickable 16:9 placeholder card living in the Hero right column. No video
+   wired up yet — clicking opens the live dashboard in a new tab as the most
+   useful no-op fallback. Replace the inner <a> with a modal/iframe player
+   once the actual recording is uploaded.
+
+   Visual: surface-1 card · faint grid backdrop · centered play button +
+   label below. Hover lifts the play button's bg and brings the ring closer
+   so the affordance is obvious without animation cost. */
+function DemoVideoPoster() {
+  return (
+    <a
+      id="demo-video"
+      href={DASHBOARD_URL}
+      target="_blank"
+      rel="noreferrer"
+      aria-label="Watch the Bonus Agent demo"
+      className="group/poster relative block aspect-video w-full overflow-hidden rounded-2xl border border-border bg-surface-1 transition-colors hover:border-foreground/30"
+    >
+      {/* Faint grid backdrop — same vocabulary as cdn-backdrop but tighter,
+          so the empty poster doesn't read as a broken image. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] [background-size:32px_32px]"
+      />
+      {/* Top eyebrow — frames the card as a recorded demo, not a hero image. */}
+      <div className="absolute left-5 top-5 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        <span className="inline-block size-1.5 rounded-full bg-foreground/60" />
+        Live demo · ~90 sec
+      </div>
+      {/* Center: play button + label */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+        <span className="inline-flex size-16 items-center justify-center rounded-full border border-border bg-background/80 text-foreground transition-all group-hover/poster:scale-105 group-hover/poster:border-foreground/40 sm:size-20">
+          <HugeiconsIcon icon={PlayCircle02Icon} className="size-8 sm:size-10" />
+        </span>
+        <span className="text-sm font-medium text-foreground sm:text-base">
+          See the agent fill 25+ ACMS fields
+        </span>
+        <span className="text-xs text-muted-foreground sm:text-sm">
+          Opens the live dashboard in a new tab
+        </span>
+      </div>
+    </a>
   )
 }
 
