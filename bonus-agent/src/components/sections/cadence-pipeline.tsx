@@ -10,9 +10,9 @@
  * mobile each panel is followed by its note.
  *
  *   01 · promo calendar — the spreadsheet the team keeps; the agent reads a cell
- *   02 · ACMS config    — 25+ fields auto-filled, three flagged for a human
+ *   02 · Promo Engine config    — 25+ fields auto-filled, three flagged for a human
  *   03 · batch review   — every campaign, planned → filled
- *   04 · handoff        — fork: Moderated (a manager approves) / Direct (into ACMS)
+ *   04 · handoff        — fork: Moderated (a manager approves) / Direct (into Promo Engine)
  *
  * Caret + dots drop under prefers-reduced-motion.
  *
@@ -35,18 +35,18 @@ export const CADENCE_CAPTIONS: readonly CadenceCaption[] = [
   },
   {
     n: "02",
-    title: "Types the ACMS config",
+    title: "Types the Promo Engine config",
     body: "25+ fields auto-filled against your per-currency limits and the schema; the handful that need a human are flagged.",
   },
   {
     n: "03",
     title: "Reviews the whole batch",
-    body: "Planned vs filled, every campaign side by side — one screen instead of clicking ACMS row by row.",
+    body: "Planned vs filled, every campaign side by side — one screen instead of clicking Promo Engine row by row.",
   },
   {
     n: "04",
     title: "Hands off your way",
-    body: "Moderated — a manager approves before it ships. Direct — straight into ACMS. You pick, per brand.",
+    body: "Moderated — a manager approves before it ships. Direct — straight into Promo Engine. You pick, per brand.",
   },
 ]
 
@@ -314,7 +314,7 @@ export function ConfigPanel() {
     { k: TYPING[0], v: TYPING[1], flagged: false, typing: true },
   ]
   return (
-    <Window file="campaign · acms-config" status="auto-filling" pulse>
+    <Window file="campaign · promo-engine-config" status="auto-filling" pulse>
       <div className="flex flex-1 flex-col justify-evenly gap-1.5 p-5 font-mono text-sm leading-relaxed sm:p-6">
         <div className="pb-1 text-xs uppercase tracking-wider text-muted-foreground/55">
           deposit-cash · brand aurora · row 14
@@ -532,8 +532,8 @@ export function HandoffPanel() {
           <BranchCard
             title="Direct"
             tag="autopilot"
-            desc="The agent writes straight into ACMS — no middle step."
-            chip="written to ACMS"
+            desc="The agent writes straight into Promo Engine — no middle step."
+            chip="written to Promo Engine"
           />
         </div>
     </div>

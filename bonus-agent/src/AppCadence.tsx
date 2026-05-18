@@ -1,5 +1,5 @@
 /**
- * /products/cadence — pitch landing for "Bonus Agent" (automates ACMS bonus-
+ * /products/cadence — pitch landing for "Bonus Agent" (automates Promo Engine bonus-
  * campaign setup for iGaming CRM teams). Content recreated 1:1 from the source
  * pitch (bonus-agent-demo · app/pitch/page.tsx + components/pitch/PipelineScene),
  * redesigned in this site's visual language: monochrome semantic tokens, our
@@ -314,7 +314,7 @@ function SeeItInAction() {
         </div>
         <Reveal delay={0.12}>
           <p className="mx-auto mt-5 max-w-2xl text-balance text-center text-sm leading-snug text-muted-foreground sm:text-base">
-            On screen: timeline kanban — 14 days of promos at a glance. Click any card to expand the inline ACMS editor.
+            On screen: timeline kanban — 14 days of promos at a glance. Click any card to expand the inline Promo Engine editor.
           </p>
         </Reveal>
         <Reveal delay={0.15}>
