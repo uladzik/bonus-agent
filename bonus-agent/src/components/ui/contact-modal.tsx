@@ -72,7 +72,7 @@ export function ContactModal({ label, size = "lg" }: Props) {
                     <textarea
                       name="message"
                       rows={3}
-                      placeholder="Which ACMS, how many brands, current bonus volume..."
+                      placeholder="Which Promo Engine, how many brands, current bonus volume..."
                       className="w-full resize-none rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/40 focus:border-foreground/30"
                     />
                   </div>

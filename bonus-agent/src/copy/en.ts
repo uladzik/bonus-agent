@@ -9,7 +9,7 @@ export const en = {
     eyebrow: "For iGaming CRM & Promotions teams",
     titleHead: "Hundreds of campaigns a month.",
     titleTail: "None of them typed by hand.",
-    sub: "The agent reads your retention calendar and writes every bonus into your ACMS — without operators, without field errors, at any volume.",
+    sub: "The agent reads your retention calendar and writes every bonus into your Promo Engine — without operators, without field errors, at any volume.",
     stats: [
       { value: "< 1 min", label: "To prepare a campaign for review" },
       { value: "−99%", label: "Configuration errors at any scale" },
@@ -19,7 +19,7 @@ export const en = {
 
   how: {
     eyebrow: "How it works",
-    title: "From the spreadsheet your team keeps to ACMS — without the typing.",
+    title: "From the spreadsheet your team keeps to Promo Engine — without the typing.",
   },
 
   pipeline: {
@@ -31,18 +31,18 @@ export const en = {
       },
       {
         n: "02",
-        title: "Types the ACMS config",
+        title: "Types the Promo Engine config",
         body: "25+ fields auto-filled against your per-currency limits and the schema; the handful that need a human are flagged.",
       },
       {
         n: "03",
         title: "Reviews the whole batch",
-        body: "Planned vs filled, every campaign side by side — one screen instead of clicking ACMS row by row.",
+        body: "Planned vs filled, every campaign side by side — one screen instead of clicking Promo Engine row by row.",
       },
       {
         n: "04",
         title: "Hands off your way",
-        body: "Moderated — a manager approves before it ships. Direct — straight into ACMS. You pick, per brand.",
+        body: "Moderated — a manager approves before it ships. Direct — straight into Promo Engine. You pick, per brand.",
       },
     ],
   },
@@ -55,7 +55,7 @@ export const en = {
     flows: [
       {
         pain: { stat: "~20 min", title: "Manual entry — 16 h/week, grows with volume" },
-        fix: { stat: "< 1 min", title: "Auto-fills 25+ ACMS fields" },
+        fix: { stat: "< 1 min", title: "Auto-fills 25+ Promo Engine fields" },
       },
       {
         pain: { stat: "1–2/mo", title: `Field mistakes, ~${eur(200)} each` },
@@ -98,7 +98,7 @@ export const en = {
   pricing: {
     eyebrow: "Pricing",
     title: "One engagement. Then you decide.",
-    sub: "Three weeks on your real ACMS, with the agent running under your moderation. You walk away with measured numbers and a written recommendation — even if we don't continue.",
+    sub: "Three weeks on your real Promo Engine, with the agent running under your moderation. You walk away with measured numbers and a written recommendation — even if we don't continue.",
     poc: {
       label: "Proof of Concept",
       price: eur(5000),
@@ -110,7 +110,7 @@ export const en = {
         {
           n: "Week 1",
           title: "Sandbox",
-          body: "We map your retention sheet to your ACMS contract on a sandbox brand. Production isn't touched yet.",
+          body: "We map your retention sheet to your Promo Engine contract on a sandbox brand. Production isn't touched yet.",
         },
         {
           n: "Week 2",
@@ -147,7 +147,7 @@ export const en = {
         {
           name: "Just this brand",
           desc:
-            "We stay on support and react fast to any changes — field types, schemas, ACMS shifts. Our team owns stability and delivery of every campaign.\n\nWhen something non-standard shows up, we fix it quickly and keep the agent running uninterrupted.",
+            "We stay on support and react fast to any changes — field types, schemas, Promo Engine shifts. Our team owns stability and delivery of every campaign.\n\nWhen something non-standard shows up, we fix it quickly and keep the agent running uninterrupted.",
         },
         {
           name: "Across your brands",
@@ -157,7 +157,7 @@ export const en = {
         {
           name: "Walk away",
           desc:
-            "A clear picture of what automation can and can't do in your ACMS.\n\nBuild it in-house, hire for it, or stay manual — your call.",
+            "A clear picture of what automation can and can't do in your Promo Engine.\n\nBuild it in-house, hire for it, or stay manual — your call.",
         },
       ],
     },

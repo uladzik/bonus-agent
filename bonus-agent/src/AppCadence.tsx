@@ -1,5 +1,5 @@
 /**
- * /products/cadence — pitch landing for "Bonus Agent" (automates ACMS bonus-
+ * /products/cadence — pitch landing for "Bonus Agent" (automates Promo Engine bonus-
  * campaign setup for iGaming CRM teams). Content recreated 1:1 from the source
  * pitch (bonus-agent-demo · app/pitch/page.tsx + components/pitch/PipelineScene),
  * redesigned in this site's visual language: monochrome semantic tokens, our
@@ -21,13 +21,20 @@ import {
   AnalyticsUpIcon,
   BookOpen01Icon,
   Compass01Icon,
+  ArrowRight01Icon,
 } from "@hugeicons/core-free-icons"
 import { Button } from "@/components/ui/button"
 import { ThemeSwitch } from "@/components/ui/theme-switch"
 import { CadencePipeline, FlowConnector } from "@/components/sections/cadence-pipeline"
 import { LocaleProvider, useCopy } from "@/copy"
 
-const TELEGRAM_URL = "https://t.me/blabbing"
+const TELEGRAM_URL = "https://t.me/upreadydev"
+/* New Cadencio dashboard (`~/repos/agentbonus/cademcio`, branch
+   `cadencio-2026-05-17`). Runs on `next dev -p 3002`. The previously
+   deployed `bonus-agent-demo.pages.dev` is the older version and is
+   not used here. Once the new dashboard is deployed, swap this to
+   the public URL. */
+const DASHBOARD_URL = "https://cademcio.vercel.app"
 
 /* Icons for the "after the engagement" tier cards. Pulled out of COPY so the
    translated dictionaries stay pure strings — the icons don't change per
@@ -60,6 +67,7 @@ function AppCadenceInner() {
       <CadenceNav />
       <main className="relative flex flex-1 flex-col">
         <Hero />
+        <SeeItInAction />
         <HowItWorks />
         <ProblemFix />
         <Economics />
@@ -140,15 +148,27 @@ function SectionHeader({
   eyebrow,
   title,
   subtitle,
+  className,
+  titleClassName,
 }: {
   eyebrow: string
   title: string
   subtitle?: string
+  // Override the wrapper's max-width when a section needs a wider title (e.g.,
+  // a single-line headline that would otherwise wrap inside `max-w-2xl`).
+  className?: string
+  // Optional title-only override — used to force `whitespace-nowrap` on
+  // headlines that must stay on one line at large breakpoints.
+  titleClassName?: string
 }) {
   return (
-    <Reveal className="flex max-w-2xl flex-col gap-4">
+    <Reveal className={`flex flex-col gap-4 ${className ?? "max-w-2xl"}`}>
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="text-balance text-3xl font-semibold leading-[1.12] text-foreground sm:text-4xl lg:text-5xl">
+      <h2
+        className={`text-balance text-3xl font-semibold leading-[1.12] text-foreground sm:text-4xl lg:text-5xl ${
+          titleClassName ?? ""
+        }`}
+      >
         {title}
       </h2>
       {subtitle && (
@@ -219,6 +239,16 @@ function Hero() {
             {hero.sub}
           </p>
         </Reveal>
+        <Reveal delay={0.15}>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Button asChild size="lg" data-icon="inline-end">
+              <a href={DASHBOARD_URL} target="_blank" rel="noreferrer">
+                Open live dashboard
+                <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
+              </a>
+            </Button>
+          </div>
+        </Reveal>
         {/* Stat tiles — 3 equal columns on sm+ (mobile stacks 1-col).
             Number type scales by viewport: text-3xl on mobile / sm
             (narrow 3-col columns ≈ 150–200 px would wrap a text-5xl
@@ -239,6 +269,134 @@ function Hero() {
         </div>
       </div>
     </section>
+  )
+}
+
+/* ── see it in action ──────────────────────────────────────────────────────
+   Two live iframes of the dashboard, sized to actual device proportions:
+   desktop at 1280×720 (HD), mobile at 375×812 (iPhone X-class). On lg+ the
+   grid is `[3.85fr_1fr]` — exactly (1280/720) / (375/812), the ratio that
+   lands both cards on the SAME visible height while each keeps its native
+   aspect. `items-start` top-aligns the two cards so they read as a matched
+   pair. On < lg the row collapses into a stack; each card caps its own
+   max-width (`640` / `240`) so the desktop preview still looks like a
+   screen and the phone still looks like a phone. A single shared caption
+   sits below the grid naming what's currently on screen — one line of
+   context for both previews, no per-card repetition. */
+function SeeItInAction() {
+  return (
+    <section id="demo" className="scroll-mt-20 py-14 sm:py-20">
+      <div className={SHELL}>
+        <SectionHeader
+          eyebrow="See it in action"
+          title="The dashboard the operator actually uses."
+          subtitle="Two live previews of the same tool — desktop on the left, mobile on the right. Both are interactive: click the timeline, expand a campaign, edit any field."
+          // Wider wrapper + nowrap on lg+ keeps the headline on a single
+          // line at the breakpoint where text-5xl kicks in.
+          className="max-w-5xl"
+          titleClassName="lg:whitespace-nowrap"
+        />
+        <div className="mt-12 grid grid-cols-1 items-start justify-items-center gap-6 lg:mt-14 lg:grid-cols-[3fr_1fr] lg:justify-items-stretch">
+          <Reveal delay={0.05} className="w-full max-w-[640px] lg:max-w-none">
+            <FramePreview
+              nativeWidth={1280}
+              nativeHeight={720}
+              ariaLabel="Live desktop preview of Bonus Agent dashboard"
+            />
+          </Reveal>
+          <Reveal delay={0.08} className="w-full max-w-[240px] lg:max-w-none">
+            <FramePreview
+              nativeWidth={375}
+              nativeHeight={812}
+              ariaLabel="Live mobile preview of Bonus Agent dashboard"
+            />
+          </Reveal>
+        </div>
+        <Reveal delay={0.12}>
+          <p className="mx-auto mt-5 max-w-2xl text-balance text-center text-sm leading-snug text-muted-foreground sm:text-base">
+            On screen: timeline kanban — 14 days of promos at a glance. Click any card to expand the inline Promo Engine editor.
+          </p>
+        </Reveal>
+        <Reveal delay={0.15}>
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:mt-14">
+            <Button asChild size="lg" data-icon="inline-end">
+              <a href={DASHBOARD_URL} target="_blank" rel="noreferrer">
+                Open the live dashboard
+                <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
+              </a>
+            </Button>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  )
+}
+
+/* Window-chrome card wrapping a live <iframe> rendered at a chosen native
+   viewport (`nativeWidth` × `nativeHeight`) and scaled via ResizeObserver
+   to exactly fill the card width. The card's own aspect ratio is derived
+   from the native dimensions so the iframe always fills the surface with
+   no letterboxing, regardless of viewport.
+
+   Used for both desktop (1280×720) and mobile (375×812) variants — the
+   only difference is the native size passed in. Scaling preserves
+   readability across viewports: the dashboard renders ONCE at the chosen
+   breakpoint and is then zoomed visually, instead of forcing its
+   responsive logic to re-flow at an awkward container width. */
+function FramePreview({
+  nativeWidth,
+  nativeHeight,
+  ariaLabel,
+}: {
+  nativeWidth: number
+  nativeHeight: number
+  ariaLabel: string
+}) {
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  // Initial scale is a reasonable fallback before the ResizeObserver fires
+  // so the iframe isn't rendered at 1× and overflowing for one paint.
+  const [scale, setScale] = useState(0.5)
+
+  useEffect(() => {
+    const el = wrapperRef.current
+    if (!el || typeof ResizeObserver === "undefined") return
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width
+      if (w && w > 0) setScale(w / nativeWidth)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [nativeWidth])
+
+  return (
+    <div>
+      <Card className="overflow-hidden">
+        <div className="flex items-center gap-1.5 border-b border-border px-4 py-3">
+          <span className="size-3 rounded-full bg-foreground/15" />
+          <span className="size-3 rounded-full bg-foreground/15" />
+          <span className="size-3 rounded-full bg-foreground/15" />
+          <span className="ml-3 truncate font-mono text-xs text-muted-foreground">
+            bonus-agent-demo.pages.dev
+          </span>
+        </div>
+        <div
+          ref={wrapperRef}
+          className="relative h-[350px] overflow-hidden bg-surface-1 lg:h-[450px]"
+        >
+          <iframe
+            src={DASHBOARD_URL}
+            title={ariaLabel}
+            loading="lazy"
+            className="absolute left-0 top-0 origin-top-left border-0"
+            style={{
+              width: `${nativeWidth}px`,
+              height: `${nativeHeight}px`,
+              transform: `scale(${scale})`,
+            }}
+          />
+        </div>
+      </Card>
+    </div>
   )
 }
 
